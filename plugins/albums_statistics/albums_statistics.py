@@ -13,7 +13,6 @@ D - An integer variable counting albums Complete & modified,
 E - An integer variable counting albums Errored,
 T - An integer variable summing up the above variables'''
 
-from PyQt5 import QtGui
 from PyQt5.QtWidgets import QLabel, QGridLayout, QWidget
 from PyQt5.QtGui import QPixmap, QIcon
 
@@ -25,7 +24,7 @@ grid = QGridLayout()
 statwindow.setLayout(grid)
 statwindow.setGeometry(100, 100, 400, 200)
 statwindow.setWindowTitle("Albums Statistics")
-statwindow.setWindowIcon(QtGui.QIcon(":/images/16x16/org.musicbrainz.Picard.png"))
+statwindow.setWindowIcon(QIcon(":/images/16x16/org.musicbrainz.Picard.png"))
 statwindow.setStyleSheet("font-size:12pt;")
 
 class AlbumStats(BaseAction):
