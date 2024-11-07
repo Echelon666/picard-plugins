@@ -1,92 +1,87 @@
 PLUGIN_NAME = "Albums Statistics"
 PLUGIN_AUTHOR = "Echelon"
+PLUGIN_DESCRIPTION = "Summarises the status of selected albums e.g. Changed?, Complete? Error?"
 PLUGIN_VERSION = '0.1'
 PLUGIN_API_VERSIONS = ['2.2']
 PLUGIN_LICENSE = "GPL-2.0-or-later"
 PLUGIN_LICENSE_URL = "https://www.gnu.org/licenses/gpl-2.0.html"
-PLUGIN_DESCRIPTION = '''Counts the quality or status of albums.
 
-A - An integer variable counting albums Incomplete & unchanged,
-B - An integer variable counting albums Incomplete & modified,
-C - An integer variable counting albums Complete & unchanged,
-D - An integer variable counting albums Complete & modified,
-E - An integer variable counting albums Errored,
-T - An integer variable summing up the above variables'''
-
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import QLabel, QGridLayout, QWidget
 from PyQt5.QtGui import QPixmap, QIcon
 
 from picard.ui.itemviews import BaseAction, register_album_action
 
-statwindow = QWidget()
-grid = QGridLayout()
+class AlbumsStats(BaseAction):
+    NAME = "Albums Statistics"
 
-statwindow.setLayout(grid)
-statwindow.setGeometry(100, 100, 400, 200)
-statwindow.setWindowTitle("Albums Statistics")
-statwindow.setWindowIcon(QIcon(":/images/16x16/org.musicbrainz.Picard.png"))
-statwindow.setStyleSheet("font-size:12pt;")
+    def __init__(self):
+        # Create grid hidden
+        self.grid = QGridLayout()
+        self.grid.addWidget(QLabel(_("The status of the selected Albums is as follows:")), 0, 0, 1, 3)
 
-class AlbumStats(BaseAction):
-    NAME = "Statistics"
+        self.addGridRow(1, ":/images/22x22/media-optical.png",
+            _("Incomplete & unchanged"))
+        self.addGridRow(2, ":/images/22x22/media-optical-modified.png",
+            _("Incomplete & modified"))
+        self.addGridRow(3, ":/images/22x22/media-optical-saved.png",
+            _("Complete & unchanged"))
+        self.addGridRow(4, ":/images/22x22/media-optical-saved-modified.png",
+            _("Complete & modified"))
+        self.addGridRow(5, ":/images/22x22/media-optical-error.png",
+            _("Errored"))
+        self.addGridRow(6, "",
+            _("Total"))
+
+        self.grid.addWidget(QLabel("Total"), 6, 2)
+
+        self.window = QWidget()
+        self.window.setLayout(self.grid)
+        self.window.setGeometry(100, 100, 400, 200)
+        self.window.setWindowTitle(_("Albums Statistics"))
+        self.window.setWindowIcon(QIcon(":/images/16x16/org.musicbrainz.Picard.png"))
+        self.window.setStyleSheet("font-size:12pt;")
+
+    def addGridRow(self, row, icon_location, description):
+        icon = QLabel()
+        if icon_location:
+            icon.setPixmap(QPixmap(icon_location))
+        self.grid.addWidget(icon, row, 0)
+
+        self.grid.addWidget(QLabel(""), row, 1)
+
+        self.grid.addWidget(QLabel(description), row, 2)
+
+    def setCounter(self, row, count):
+        counter = self.grid.itemAtPosition(row, 1)
+        counter.setText(str(count))
 
     def callback(self, objs):
-        A = B = C = D = E = 0
-
-        while grid.count():
-            item = grid.takeAt(0)
-            widget = item.widget()
-            if widget is not None:
-                widget.clear()
-
-        icon1 = QLabel()
-        icon1.setPixmap(QPixmap(":/images/22x22/media-optical.png"))
-        icon2 = QLabel()
-        icon2.setPixmap(QPixmap(":/images/22x22/media-optical-modified.png"))
-        icon3 = QLabel()
-        icon3.setPixmap(QPixmap(":/images/22x22/media-optical-saved.png"))
-        icon4 = QLabel()
-        icon4.setPixmap(QPixmap(":/images/22x22/media-optical-saved-modified.png"))
-        icon5 = QLabel()
-        icon5.setPixmap(QPixmap(":/images/22x22/media-optical-error.png"))
-
-        grid.addWidget(icon1, 1, 0)
-        grid.addWidget(icon2, 2, 0)
-        grid.addWidget(icon3, 3, 0)
-        grid.addWidget(icon4, 4, 0)
-        grid.addWidget(icon5, 5, 0)
-
-        grid.addWidget(QLabel("The status of the selected Albums is as follows:"), 0, 0, 1, 3)
-        grid.addWidget(QLabel("Incomplete & unchanged"), 1, 2)
-        grid.addWidget(QLabel("Incomplete & modified"), 2, 2)
-        grid.addWidget(QLabel("Complete & unchanged"), 3, 2)
-        grid.addWidget(QLabel("Complete & modified"), 4, 2)
-        grid.addWidget(QLabel("Errored"), 5, 2)
-        grid.addWidget(QLabel("Total"), 6, 2)
+        incomplete_unchanged = incomplete_modified = complete_unchanged = complete_modified = errored = 0
 
         for album in objs:
             if album.errors:
-                E = E + 1
+                errored += 1
             elif album.is_complete():
                 if album.is_modified():
-                    D = D + 1
+                    complete_modified += 1
                 else:
-                    C = C + 1
+                    complete_unchanged += 1
             else:
                 if album.is_modified():
-                    B = B + 1
+                    incomplete_modified += 1
                 else:
-                    A = A + 1
+                    incomplete_unchanged += 1
 
-        T = A + B + C + D + E
+        total = incomplete_unchanged + incomplete_modified + complete_unchanged + complete_modified + errored
 
-        grid.addWidget(QLabel(str(A)), 1, 1)
-        grid.addWidget(QLabel(str(B)), 2, 1)
-        grid.addWidget(QLabel(str(C)), 3, 1)
-        grid.addWidget(QLabel(str(D)), 4, 1)
-        grid.addWidget(QLabel(str(E)), 5, 1)
-        grid.addWidget(QLabel(str(T)), 6, 1)
+        self.setCounter(1, incomplete_unchanged)
+        self.setCounter(2, incomplete_modified)
+        self.setCounter(3, complete_unchanged)
+        self.setCounter(4, complete_modified)
+        self.setCounter(5, errored)
+        self.setCounter(6, total)
 
-        statwindow.show()
+        self.window.show()
 
-register_album_action(AlbumStats())
+register_album_action(AlbumsStats())
