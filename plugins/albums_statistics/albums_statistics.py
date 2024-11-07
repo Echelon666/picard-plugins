@@ -6,7 +6,6 @@ PLUGIN_API_VERSIONS = ['2.2']
 PLUGIN_LICENSE = "GPL-2.0-or-later"
 PLUGIN_LICENSE_URL = "https://www.gnu.org/licenses/gpl-2.0.html"
 
-from PyQt5 import QtGui
 from PyQt5.QtWidgets import QLabel, QGridLayout, QWidget
 from PyQt5.QtGui import QPixmap, QIcon
 
