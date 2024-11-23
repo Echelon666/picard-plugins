@@ -6,6 +6,7 @@ PLUGIN_API_VERSIONS = ['2.2']
 PLUGIN_LICENSE = "GPL-2.0-or-later"
 PLUGIN_LICENSE_URL = "https://www.gnu.org/licenses/gpl-2.0.html"
 
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import QLabel, QGridLayout, QWidget
 from PyQt5.QtGui import QPixmap, QIcon
 
@@ -15,6 +16,8 @@ class AlbumsStats(BaseAction):
     NAME = "Albums Statistics"
 
     def __init__(self):
+        super().__init__()
+
         # Create grid hidden
         self.grid = QGridLayout()
         self.grid.addWidget(QLabel(_("The status of the selected Albums is as follows:")), 0, 0, 1, 3)
@@ -73,14 +76,14 @@ class AlbumsStats(BaseAction):
                     incomplete_unchanged += 1
 
         total = incomplete_unchanged + incomplete_modified + complete_unchanged + complete_modified + errored
-
+        '''
         self.setCounter(1, incomplete_unchanged)
         self.setCounter(2, incomplete_modified)
         self.setCounter(3, complete_unchanged)
         self.setCounter(4, complete_modified)
         self.setCounter(5, errored)
         self.setCounter(6, total)
-
+        '''
         self.window.show()
 
 register_album_action(AlbumsStats())
