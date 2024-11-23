@@ -6,7 +6,6 @@ PLUGIN_API_VERSIONS = ['2.2']
 PLUGIN_LICENSE = "GPL-2.0-or-later"
 PLUGIN_LICENSE_URL = "https://www.gnu.org/licenses/gpl-2.0.html"
 
-from PyQt5 import QtGui
 from PyQt5.QtWidgets import QLabel, QGridLayout, QWidget
 from PyQt5.QtGui import QPixmap, QIcon
 
@@ -76,14 +75,14 @@ class AlbumsStats(BaseAction):
                     incomplete_unchanged += 1
 
         total = incomplete_unchanged + incomplete_modified + complete_unchanged + complete_modified + errored
-        '''
+        
         self.setCounter(1, incomplete_unchanged)
         self.setCounter(2, incomplete_modified)
         self.setCounter(3, complete_unchanged)
         self.setCounter(4, complete_modified)
         self.setCounter(5, errored)
         self.setCounter(6, total)
-        '''
+        
         self.window.show()
 
 register_album_action(AlbumsStats())
