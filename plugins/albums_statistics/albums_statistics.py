@@ -45,7 +45,7 @@ class AlbumsStats(BaseAction):
         while self.grid.count():
             item = self.grid.takeAt(0)
             widget = item.widget()
-            if widget is not None: 
+            if widget is not None:
                 widget.clear()
 
     def addGridRow(self, row, icon_location, description):
