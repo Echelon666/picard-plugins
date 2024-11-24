@@ -17,10 +17,16 @@ class AlbumsStats(BaseAction):
     def __init__(self):
         super().__init__()
 
-        # Create grid hidden
         self.grid = QGridLayout()
-        self.grid.addWidget(QLabel(_("The status of the selected Albums is as follows:")), 0, 0, 1, 3)
+        self.window = QWidget()
+        self.window.setLayout(self.grid)
+        self.window.setGeometry(100, 100, 400, 250)
+        self.window.setWindowTitle(_("Albums Statistics"))
+        self.window.setWindowIcon(QIcon(":/images/16x16/org.musicbrainz.Picard.png"))
+        self.window.setStyleSheet("font-size:12pt;")
 
+    def createWidget(self):
+        self.grid.addWidget(QLabel(_("The status of the selected Albums is as follows:")), 0, 0, 1, 3)
         self.addGridRow(1, ":/images/22x22/media-optical.png",
             _("Incomplete & unchanged"))
         self.addGridRow(2, ":/images/22x22/media-optical-modified.png",
@@ -33,32 +39,31 @@ class AlbumsStats(BaseAction):
             _("Errored"))
         self.addGridRow(6, "",
             _("Total"))
-
         self.grid.addWidget(QLabel("Total"), 6, 2)
 
-        self.window = QWidget()
-        self.window.setLayout(self.grid)
-        self.window.setGeometry(100, 100, 400, 200)
-        self.window.setWindowTitle(_("Albums Statistics"))
-        self.window.setWindowIcon(QIcon(":/images/16x16/org.musicbrainz.Picard.png"))
-        self.window.setStyleSheet("font-size:12pt;")
+    def clearWidget(self):
+        while self.grid.count():
+            item = self.grid.takeAt(0)
+            widget = item.widget()
+            if widget is not None: 
+                widget.clear()
 
     def addGridRow(self, row, icon_location, description):
         icon = QLabel()
         if icon_location:
             icon.setPixmap(QPixmap(icon_location))
         self.grid.addWidget(icon, row, 0)
-
         self.grid.addWidget(QLabel(""), row, 1)
-
         self.grid.addWidget(QLabel(description), row, 2)
 
     def setCounter(self, row, count):
-        counter = self.grid.itemAtPosition(row, 1)
-        counter.setText(str(count))
+        self.grid.addWidget(QLabel(str(count)), row, 1)
 
     def callback(self, objs):
         incomplete_unchanged = incomplete_modified = complete_unchanged = complete_modified = errored = 0
+
+        self.clearWidget()
+        self.createWidget()
 
         for album in objs:
             if album.errors:
